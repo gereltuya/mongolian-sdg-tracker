@@ -4,7 +4,7 @@ import plotly.express as px
 
 @st.cache_resource
 def load_data():
-    df = pd.read_csv('C:\\Users\\anuba\\Documents\\Greendot\\csv-dump\\deaths-and-missing-persons-due-to-natural-disasters.csv')
+    df = pd.read_csv('deaths-and-missing-persons-due-to-natural-disasters.csv')
     return df
 
 df = load_data()
