@@ -1,44 +1,50 @@
 import streamlit as st
 import pandas as pd
 import plotly.express as px
+import streamlit.components.v1 as components
 
-@st.cache_resource
-def load_data():
-    df = pd.read_csv('C:\\Users\\anuba\\Documents\\Greendot\\csv-dump\\deaths-and-missing-persons-due-to-natural-disasters.csv')
-    return df
+st.title("Mongolian SDG Tracker - Demo")
 
-df = load_data()
 
-st.title('Deaths and Missing Persons due to Natural Disasters')
+st.markdown("Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.")
+st.divider()
+files_info = {
+    'deaths-and-missing-persons-due-to-natural-disasters.csv': 'Rate of Deaths and Missing Persons due to Natural Disasters',
+    'internally-displaced-persons-from-disasters.csv': 'Internally Displaced Persons from Disasters',
+    'natural-disasters.csv': 'Natural Disasters'
+}
 
-filtered_data = df.copy() #filter data
+iframe_urls = {
+    'number-homeless-from-natural-disasters.csv': ("Number Homeless from Natural Disasters", "https://ourworldindata.org/grapher/number-homeless-from-natural-disasters"),
+    'number-injured-from-disasters.csv': ("Number Injured from Disasters", "https://ourworldindata.org/grapher/number-injured-from-disasters"),
+    'total-affected-by-natural-disasters.csv': ("Total Affected by Natural Disasters", "https://ourworldindata.org/grapher/total-affected-by-natural-disasters")
+}
+@st.cache_data
+def load_data(file_name):
+    path = f'./csv-dump/{file_name}'
+    return pd.read_csv(path)
 
-#line plot
 country = 'Mongolia'
-filtered_data_mongolia = df[df['Entity'] == country]
-fig_mongolia = px.line(filtered_data_mongolia, x='Year', y='13.1.1 - Number of deaths and missing persons attributed to disasters per 100,000 population (number) - VC_DSR_MTMP', labels={'13.1.1 - Number of deaths and missing persons attributed to disasters per 100,000 population (number) - VC_DSR_MTMP': 'Count'}, title=f'Deaths and Missing Persons in {country}')
-fig_mongolia.update_traces(hovertemplate="Year: %{x}<br>Count: %{y}")
-st.plotly_chart(fig_mongolia)
 
-#toggle raw data
-if st.button("Show Raw Data for Mongolia"):
-    st.write(filtered_data_mongolia)
+for file_name, title in files_info.items():
+    df = load_data(file_name)
+    st.subheader(title)
+    
+    if file_name == 'natural-disasters.csv':
+        df['Total deaths from disasters'] = df.filter(regex='Number of deaths from').sum(axis=1)
+        filtered_data = df[df['Country name'] == country]
+        fig = px.bar(filtered_data, x='Year', y='Total deaths from disasters', title='Total Deaths from Disasters in Mongolia')
+        fig.update_traces(hovertemplate="Year: %{x}<br>Total Deaths: %{y}")
+        st.plotly_chart(fig)
+    else:
+        column_name = df.columns[-1]
+        filtered_data = df[df['Entity'] == country]
+        fig = px.line(filtered_data, x='Year', y=column_name, labels={column_name: 'Count'}, title=f'{title} in {country}')
+        fig.update_traces(hovertemplate="Year: %{x}<br>Count: %{y}")
+        st.plotly_chart(fig)
+        if st.button(f"Show Raw Data for {country} - {title}"):
+            st.write(filtered_data)
 
-#map
-fig_global_map = px.choropleth(data_frame=filtered_data,
-                               locations='Entity',
-                               locationmode='country names',
-                               color='13.1.1 - Number of deaths and missing persons attributed to disasters per 100,000 population (number) - VC_DSR_MTMP',
-                               title='Global Map - Deaths and Missing Persons',
-                               projection='natural earth')
-
-# center map to mongolia
-fig_global_map.update_geos(center_lon=103.8467, center_lat=46.8625)
-
-fig_global_map.update_layout(height=400, margin={"r":0,"t":30,"l":0,"b":0}, coloraxis_colorbar=dict(title=""))
-
-#year slider + map
-year_slider = st.slider("Year", min_value=min(df['Year']), max_value=max(df['Year']), value=min(df['Year']), step=1)
-filtered_data_year = filtered_data[filtered_data['Year'] == year_slider]
-fig_global_map.data[0].update(z=filtered_data_year['13.1.1 - Number of deaths and missing persons attributed to disasters per 100,000 population (number) - VC_DSR_MTMP'])
-st.plotly_chart(fig_global_map)
+for file_name, (title, iframe_url) in iframe_urls.items():
+    st.subheader(title) 
+    components.iframe(iframe_url, height=500)
