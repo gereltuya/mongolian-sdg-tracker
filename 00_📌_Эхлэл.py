@@ -14,7 +14,7 @@ st.set_page_config(
 
 st.sidebar.header("Mongolian SDG Data App")
 with st.sidebar:
-    st.text("Contact us")
+    st.text("Contact us: email@email.com")
 
 def image_to_base64(image):
     buffered = BytesIO()
