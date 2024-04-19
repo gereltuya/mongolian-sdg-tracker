@@ -8,7 +8,6 @@ def create_goal_section(number, goal, subdescription, iframe_url):
 
 st.title('Mongolian SDG Tracker төсөл: Зорилт #9 - ')
 st.write('lorem ipsum dolor')
-
 #JSON table
 goals_data = {
   "goals": [
