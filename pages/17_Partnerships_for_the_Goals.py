@@ -10,7 +10,7 @@ st.title('Mongolian SDG Tracker төсөл: Зорилт #17 - ')
 st.write('lorem ipsum dolor')
 
 #JSON table
-goals_data = {
+goals_data = 
  
 
 def create_goal_section(number, goal, subgoals):
