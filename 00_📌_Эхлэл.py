@@ -84,9 +84,6 @@ for row_num in range(rows):
             
             with cols[col_num]:
                 encoded_image = image_to_base64(Image.open(icon_path))
-                st.markdown(f"""
-                    <div style="text-align: center; margin-bottom: 20px;">
-                        <img src="data:image/png;base64,{encoded_image}" alt="{alt_text}" style="width:150px;">
-                    </div>
-                    """, unsafe_allow_html=True)
-                st.page_link(page_file_path) #do not add label here
+                link_content = f'<a href="{page_file_path}" style="text-decoration: none;"><img src="data:image/png;base64,{encoded_image}" alt="{alt_text}" style="width:150px;"></a>'
+                st.markdown(link_content, unsafe_allow_html=True)
+
